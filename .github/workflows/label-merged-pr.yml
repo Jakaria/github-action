@@ -10,10 +10,17 @@ jobs:
   label-merged-pr:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     steps:
-      - name: Label Merged PR as Released
-        run: |
-          echo "Adding 'released' label to PR #${{ github.event.pull_request.number }}"
-          gh pr edit ${{ github.event.pull_request.number }} --add-label "released"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Label Merged PR as Released
+      run: |
+        echo "Adding 'released' label to PR #${{ github.event.pull_request.number }}"
+        gh pr edit ${{ github.event.pull_request.number }} --add-label "released"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
