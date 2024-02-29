@@ -21,7 +21,9 @@ jobs:
       run: |
         # Get merged PR
         pr = ${{ github.event.pull_request.number }}
-        gh pr edit "$pr" --add-label "released"
+        echo "complete step1: get pr number : $pr"
+        gh pr edit $pr --add-label "released"
+        echo "complete step2: ad label"
         # Fetch connected issues for the PR
         issues=$(gh api graphql -F pr="$pr" -f query='
           query ($pr: Int!) {
@@ -36,6 +38,7 @@ jobs:
             }
           }
         ' | jq '.data.repository.pullRequest.closingIssuesReferences.nodes[].number')
+        echo "complete step3: get connected issues: $issues"
         # Tag connected issues with "released"
         for issue in $issues; do
           gh issue edit "$issue" --add-label "released"
