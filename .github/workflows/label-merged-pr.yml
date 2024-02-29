@@ -1,0 +1,19 @@
+name: Label Merged PR
+
+on:
+  pull_request:
+    branches:
+      - 'feature/*'
+    types: [closed]
+
+jobs:
+  label-merged-pr:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label Merged PR as Released
+        run: |
+          echo "Adding 'released' label to PR #${{ github.event.pull_request.number }}"
+          gh pr edit ${{ github.event.pull_request.number }} --add-label "released"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
