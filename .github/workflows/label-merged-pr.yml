@@ -20,7 +20,7 @@ jobs:
     - name: Label Merged PR as Released
       run: |
         # Get merged PR
-        pr = ${{ github.event.pull_request.number }}
+        pr=${{ github.event.pull_request.number }}
         echo "complete step1: get pr number : $pr"
         gh pr edit $pr --add-label "released"
         echo "complete step2: ad label"
