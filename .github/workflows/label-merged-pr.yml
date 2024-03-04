@@ -20,10 +20,10 @@ jobs:
   label-merged-pr-to-feature-branch:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
-      pull-requests: write
+    # permissions:
+    #   contents: read
+    #   issues: write
+    #   pull-requests: write
     steps:
     - uses: actions/checkout@v4
       with:
