@@ -1,19 +1,49 @@
-name: Label Merged PR
+name: Released Label For Merged PR
 
 on:
   pull_request:
     branches:
-      - 'feature/*'
+      - '!master'
+      - '!release'
     types: [closed]
 
 jobs:
-  label-merged-pr:
+  label-merged-pr-to-feature-branch:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
     steps:
-      - name: Label Merged PR as Released
-        run: |
-          echo "Adding 'released' label to PR #${{ github.event.pull_request.number }}"
-          gh pr edit ${{ github.event.pull_request.number }} --add-label "released"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Label Merged PR as Released
+      run: |
+        # Get merged PR
+        pr=${{ github.event.pull_request.number }}
+        echo "complete step1: get pr number : $pr"
+        gh pr edit $pr --add-label "released"
+        echo "complete step2: ad label"
+        # Fetch connected issues for the PR
+        issues=$(gh api graphql -F pr="$pr" -f query='
+          query ($pr: Int!) {
+            repository(owner: "Jakaria", name: "github-action") {
+              pullRequest(number: $pr) {
+                closingIssuesReferences(first: 100) {
+                  nodes {
+                    number
+                  }
+                }
+              }
+            }
+          }
+        ' | jq '.data.repository.pullRequest.closingIssuesReferences.nodes[].number')
+        echo "complete step3: get connected issues: $issues"
+        # Tag connected issues with "released"
+        for issue in $issues; do
+          gh issue edit "$issue" --add-label "released"
+        done
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
