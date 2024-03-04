@@ -3,7 +3,8 @@ name: Released Label For Merged PR
 on:
   pull_request:
     branches:
-      - 'feature/*'
+      - '!master'
+      - '!release'
     types: [closed]
 
 jobs:
